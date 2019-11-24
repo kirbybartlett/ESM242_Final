@@ -1,0 +1,71 @@
+---
+title: "ESM242_Final"
+author: "Kirby Bartlett"
+date: "November 23, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load libraries 
+```{r}
+library(tidyverse)
+library(cowplot)
+```
+Read in data
+```{r}
+SGMA_Model <- read_csv(file.path("Data", "SGMA_Model.csv"))
+Open_Access <- read_csv(file.path("Data", "OpenAccess.csv"))
+SGMA_2060 <- read_csv(file.path("Data", "SGMA_2060.csv"))
+SGMA_2080 <- read_csv(file.path("Data", "SGMA2080.csv"))
+SGMA_2100 <- read_csv(file.path("Data", "SGMA2100.csv"))
+Artifical_Recharge <- read_csv(file.path("Data", "Artificial_Recharge.csv"))
+Recharge_Linear_Decline <- read_csv(file.path("Data", "Recharge_Linear_Decline.csv"))
+```
+
+```{r}
+library(cowplot)
+
+
+SGMA_Model <- SGMA_Model %>% 
+  rename(SGMA_Withdrawl = Withdrawals) 
+  
+Open_Access <- Open_Access %>% 
+  rename(Open_Withdrawl = Withdrawals) 
+
+merged_withdrawls <- left_join(SGMA_Model, Open_Access, by =c('t')) %>% 
+  gather(key = 'Withdrawl_Type', value = 'Withdrawl', Open_Withdrawl, SGMA_Withdrawl)
+
+direct_labels <-  merged_withdrawls %>% 
+  group_by(Withdrawl_Type) %>%
+  summarize(y = max(Withdrawl))
+
+line_plot <- merged_withdrawls %>%
+  ggplot(aes(t, Withdrawl)) +
+  geom_line(size = 1) +
+  theme_minimal_hgrid() +
+  theme(legend.position = "none") +
+  scale_color_manual(values = c('darkgreen','deepskyblue1')) +
+  scale_x_continuous(expand = c(0,0)) +
+  labs(y = "Year")
+
+
+  
+  
+direct_labels_axis <- axis_canvas(line_plot, axis = "y") +
+  geom_text(
+ data = direct_labels,
+ aes(y = y, label = Withdrawl_Type),
+ x = .05,
+ size = 4.5,
+ hjust = 0
+  )
+
+
+p_direct_labels <-  insert_yaxis_grob(line_plot, direct_labels_axis)
+
+ggdraw(p_direct_labels)
+```
+
