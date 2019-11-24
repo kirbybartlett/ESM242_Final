@@ -25,8 +25,8 @@ Artifical_Recharge <- read_csv(file.path("Data", "Artificial_Recharge.csv"))
 Recharge_Linear_Decline <- read_csv(file.path("Data", "Recharge_Linear_Decline.csv"))
 ```
 
+Trying to add labels to the end of the lines
 ```{r}
-library(cowplot)
 
 
 SGMA_Model <- SGMA_Model %>% 
@@ -67,5 +67,22 @@ direct_labels_axis <- axis_canvas(line_plot, axis = "y") +
 p_direct_labels <-  insert_yaxis_grob(line_plot, direct_labels_axis)
 
 ggdraw(p_direct_labels)
+```
+
+
+SGMA vs Open Access
+
+```{r}
+colors <- c('cyan4', 'indianred3')
+
+line_plot <- merged_withdrawls %>%
+  ggplot(aes(t, Withdrawl )) +
+  geom_line( aes(group = Withdrawl_Type, color = Withdrawl_Type), size = 1) +
+  scale_color_manual(values=colors) +
+  theme_minimal_hgrid() +
+  scale_x_continuous(expand = c(0,0)) +
+  labs(x = "Year", y = "Withdrawls in Acre Feet")
+
+line_plot 
 ```
 
