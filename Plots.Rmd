@@ -112,11 +112,12 @@ SGMA_years_plot
 
 Artificial Recharge Plot 
 ```{r}
-Artificial_plot <- ggplot(data = Artifical_Recharge, aes(t, Withdrawals)) +
-  geom_line(size = 1) +
+Artificial_plot <- ggplot() +
+  geom_line(data = SGMA_2040, aes(t, SGMA_2040_Withdrawals), size = 1, colour = 'indianred3') +
+  geom_line(data = Artifical_Recharge, aes(t, Withdrawals), size = 1, , colour = 'cyan4') +
   scale_color_manual(values=colors) +
   theme_minimal_hgrid() +
-  scale_x_continuous(expand = c(0,0)) +
+  #scale_x_continuous(expand = c(0,0)) +
   labs(x = "Year", y = "Withdrawls in Acre Feet") +
   theme(legend.position = "none") +
   xlim(2020,2040.5)
@@ -136,5 +137,42 @@ Linear_plot <- ggplot(data = Recharge_Linear_Decline, aes(t, Withdrawals)) +
   xlim(2020,2040.5)
 
 Linear_plot 
+```
+
+Height over time 
+```{r}
+
+SGMA_2060  <- SGMA_2060  %>% 
+   dplyr::rename(SGMA_2060_height = Height) 
+  
+SGMA_2080  <- SGMA_2080 %>% 
+   dplyr::rename(SGMA_2080_height = Height) 
+
+SGMA_2100  <- SGMA_2100 %>% 
+   dplyr::rename(SGMA_2100_height = Height) 
+
+SGMA_2040 <- SGMA_2040 %>% 
+  dplyr::rename(SGMA_2040_height = Height) 
+
+
+
+
+
+SGMA_height_plot <-
+  ggplot() +
+  geom_line(data = SGMA_2040, aes(t, SGMA_2040_height), size = 1, colour = 'indianred3') +
+  geom_line(data = SGMA_2060, aes(t, SGMA_2060_height), size = 1, colour = 'cyan4') +
+  geom_line(data = SGMA_2080, aes(t, SGMA_2080_height), size = 1, colour = "#F1A94E") +
+  geom_line(data = SGMA_2100, aes(t, SGMA_2100_height), size = 1, colour = "#669900") +
+  scale_color_manual(values=colors) +
+  theme_minimal_hgrid() +
+  #scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x = "Year", y = "Watertable Height") +
+  theme(legend.position = "none") +
+  xlim(2020,2100.5)
+
+SGMA_height_plot
+
 ```
 
