@@ -26,8 +26,8 @@ SGMA_heights <- read_csv("Data/height.csv")
 # plot
 
 sgma_h_plot <- SGMA_heights %>% 
-  gather(key = 'SGMA_Model', value = 'Withdrawals', SGMA_2040, SGMA_2060,  SGMA_2080, SGMA_2100) %>% 
-  ggplot(aes(x = Year, y = Withdrawals)) +
+  gather(key = 'SGMA_Model', value = 'Height', SGMA_2040, SGMA_2060,  SGMA_2080, SGMA_2100) %>% 
+  ggplot(aes(x = Year, y = Height)) +
   geom_line(aes(color = SGMA_Model)) +
   scale_color_manual(values = c('cyan4', "#F1A94E", "#669900", 'indianred3')) +
   theme_minimal_hgrid() 
