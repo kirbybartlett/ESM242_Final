@@ -13,10 +13,11 @@ Load libraries
 ```{r}
 library(tidyverse)
 library(cowplot)
-if("dplyr" %in% (.packages())){
-          detach("package:dplyr", unload=TRUE) 
-          detach("package:plyr", unload=TRUE) 
-} 
+
+#if("dplyr" %in% (.packages())){
+ #         detach("package:dplyr", unload=TRUE) 
+#          detach("package:plyr", unload=TRUE) 
+#} 
 library(plyr)
 library(dplyr)
 ```
