@@ -13,6 +13,7 @@ Load libraries
 ```{r}
 library(tidyverse)
 library(cowplot)
+detach("package:plyr", unload=TRUE)
 ```
 Read in data
 ```{r}
@@ -28,14 +29,14 @@ Recharge_Linear_Decline <- read_csv(file.path("Data", "Recharge_Linear_Decline.c
 Merging SGMA and Open Access Data Frames 
 ```{r}
 
-SGMA_Model <- SGMA_2040 %>% 
-  rename(SGMA_2040 = Withdrawals) 
+SGMA_2040 <- SGMA_2040 %>% 
+  dplyr::rename(SGMA_2040_Withdrawals = Withdrawals) 
   
 Open_Access <- Open_Access %>% 
-  rename(Open_Withdrawl = Withdrawals) 
+  dplyr::rename(Open_Withdrawl = Withdrawals) 
 
-merged_withdrawls <- left_join(SGMA_Model, Open_Access, by =c('t')) %>% 
-  gather(key = 'Withdrawl_Type', value = 'Withdrawl', Open_Withdrawl, SGMA_Withdrawl)
+merged_withdrawls <- left_join(SGMA_2040, Open_Access, by =c('t')) %>% 
+   tidyr::gather(key = 'Withdrawl_Type', value = 'Withdrawl', SGMA_2040, Open_Withdrawl)
 
 ```
 
@@ -45,9 +46,8 @@ SGMA vs Open Access
 colors <- c('cyan4', 'indianred3')
 
 direct_labels <-  merged_withdrawls %>% 
-  group_by(Withdrawl_Type) %>%
-  summarize(y = min(Withdrawl))
-
+  dplyr::group_by(Withdrawl_Type) %>%
+  dplyr::summarize(y = min(Withdrawl))
 
 line_plot <- merged_withdrawls %>%
   ggplot(aes(t, Withdrawl )) +
@@ -57,7 +57,7 @@ line_plot <- merged_withdrawls %>%
   scale_x_continuous(expand = c(0,0)) +
   labs(x = "Year", y = "Withdrawls in Acre Feet") +
   theme(legend.position = "none") 
-
+  
 direct_labels_axis <- axis_canvas(line_plot, axis = "y") +
   geom_text(
  data = direct_labels,
@@ -76,24 +76,23 @@ ggdraw(p_direct_labels)
 ```{r}
 require(plyr)
 
-SGMA_2040 <- SGMA_Model %>% 
-  rename(SGMA_2040 = SGMA_Withdrawl) 
-
 SGMA_2060  <- SGMA_2060  %>% 
-  rename(SGMA_2060 = Withdrawals) 
+   dplyr::rename(SGMA_2060_Withdrawals = Withdrawals) 
   
 SGMA_2080  <- SGMA_2080 %>% 
-  rename(SGMA_2080 = Withdrawals) 
+   dplyr::rename(SGMA_2080_Withdrawals = Withdrawals) 
 
 SGMA_2100  <- SGMA_2100 %>% 
-  rename(SGMA_2100 = Withdrawals) 
+   dplyr::rename(SGMA_2100_Withdrawals = Withdrawals) 
 
-merged_withdrawls <- join_all(list(SGMA_Model, SGMA_2060, SGMA_2080, SGMA_2100), by ='t', type = 'full') %>% 
-  gather(key = 'Withdrawl_Type', value = 'Withdrawl', SGMA_2060, SGMA_2080, SGMA_2100)
 
-line_plot <- SGMA_2060 %>%
-  ggplot(aes(t, SGMA_2060)) +
-  geom_line(size = 1) +
+
+SGMA_years_plot <-
+  ggplot() +
+  geom_line(data = SGMA_2040, aes(t, SGMA_2040), size = 1) +
+  geom_line(data = SGMA_2060, aes(t, SGMA_2060), size = 1) +
+  geom_line(data = SGMA_2080, aes(t, SGMA_2080), size = 1) +
+  geom_line(data = SGMA_2100, aes(t, SGMA_2100), size = 1) +
   scale_color_manual(values=colors) +
   theme_minimal_hgrid() +
   scale_x_continuous(expand = c(0,0)) +
