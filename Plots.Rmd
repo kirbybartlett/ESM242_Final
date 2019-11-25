@@ -13,7 +13,12 @@ Load libraries
 ```{r}
 library(tidyverse)
 library(cowplot)
-detach("package:plyr", unload=TRUE)
+if("dplyr" %in% (.packages())){
+          detach("package:dplyr", unload=TRUE) 
+          detach("package:plyr", unload=TRUE) 
+} 
+library(plyr)
+library(dplyr)
 ```
 Read in data
 ```{r}
@@ -35,8 +40,8 @@ SGMA_2040 <- SGMA_2040 %>%
 Open_Access <- Open_Access %>% 
   dplyr::rename(Open_Withdrawl = Withdrawals) 
 
-merged_withdrawls <- left_join(SGMA_2040, Open_Access, by =c('t')) %>% 
-   tidyr::gather(key = 'Withdrawl_Type', value = 'Withdrawl', SGMA_2040, Open_Withdrawl)
+merged_withdrawls <- dplyr::left_join(SGMA_2040, Open_Access, by =c('t')) %>% 
+   tidyr::gather(key = 'Withdrawl_Type', value = 'Withdrawl', SGMA_2040_Withdrawals, Open_Withdrawl)
 
 ```
 
@@ -74,7 +79,6 @@ ggdraw(p_direct_labels)
 
 2040 vs 2060 vs 2080 vs 2100
 ```{r}
-require(plyr)
 
 SGMA_2060  <- SGMA_2060  %>% 
    dplyr::rename(SGMA_2060_Withdrawals = Withdrawals) 
@@ -89,14 +93,47 @@ SGMA_2100  <- SGMA_2100 %>%
 
 SGMA_years_plot <-
   ggplot() +
-  geom_line(data = SGMA_2040, aes(t, SGMA_2040), size = 1) +
-  geom_line(data = SGMA_2060, aes(t, SGMA_2060), size = 1) +
-  geom_line(data = SGMA_2080, aes(t, SGMA_2080), size = 1) +
-  geom_line(data = SGMA_2100, aes(t, SGMA_2100), size = 1) +
+  geom_line(data = SGMA_2040, aes(t, SGMA_2040_Withdrawals), size = 1, colour = 'indianred3') +
+  geom_line(data = SGMA_2060, aes(t, SGMA_2060_Withdrawals), size = 1, colour = 'cyan4') +
+  geom_line(data = SGMA_2080, aes(t, SGMA_2080_Withdrawals), size = 1, colour = "#F1A94E") +
+  geom_line(data = SGMA_2100, aes(t, SGMA_2100_Withdrawals), size = 1, colour = "#669900") +
+  scale_color_manual(values=colors) +
+  theme_minimal_hgrid() +
+  #scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x = "Year", y = "Withdrawls in Acre Feet") +
+  theme(legend.position = "none") +
+  xlim(2020,2100.5)
+
+SGMA_years_plot
+
+```
+
+Artificial Recharge Plot 
+```{r}
+Artificial_plot <- ggplot(data = Artifical_Recharge, aes(t, Withdrawals)) +
+  geom_line(size = 1) +
   scale_color_manual(values=colors) +
   theme_minimal_hgrid() +
   scale_x_continuous(expand = c(0,0)) +
   labs(x = "Year", y = "Withdrawls in Acre Feet") +
-  theme(legend.position = "none") 
+  theme(legend.position = "none") +
+  xlim(2020,2040.5)
 
+Artificial_plot
 ```
+
+Linear Decline Plot 
+```{r}
+Linear_plot <- ggplot(data = Recharge_Linear_Decline, aes(t, Withdrawals)) +
+  geom_line(size = 1) +
+  scale_color_manual(values=colors) +
+  theme_minimal_hgrid() +
+  #scale_x_continuous(expand = c(0,0)) +
+  labs(x = "Year", y = "Withdrawls in Acre Feet") +
+  theme(legend.position = "none") +
+  xlim(2020,2040.5)
+
+Linear_plot 
+```
+
