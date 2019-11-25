@@ -226,6 +226,7 @@ Water_Table <- read_csv(file.path("Data", "Water_Table.csv"))
 
 colors_1 <- c('indianred3', 'cyan4')
 
+
 Water_Gather_withdraw <-  tidyr::gather(data = Water_Table, key = 'Table_Type', value = 'Withdrawls', withdrawals_Recharge, Withdrawals_Open)
 
 direct_labels <-  Water_Gather_withdraw %>% 
@@ -256,5 +257,49 @@ direct_labels_axis <- axis_canvas(line_plot_height, axis = "y") +
 p_direct_labels <-  insert_yaxis_grob(line_plot_height, direct_labels_axis)
 
 ggdraw(p_direct_labels)
+```
+
+# same graph but now just change
+```{r}
+
+water_table_fixed <- Water_Table %>% 
+  select(t, withdrawals_Recharge, Withdrawals_Open) %>% 
+  mutate(wd_recharge_change = withdrawals_Recharge - 529601.9) %>% 
+  mutate(wd_open_change = Withdrawals_Open - 524398.1) %>% 
+  select(t, wd_recharge_change, wd_open_change)
+
+Water_Gather_withdraw <-  tidyr::gather(data = water_table_fixed, key = 'Table_Type', value = 'Change_Withdrawls', 
+                                        wd_recharge_change, wd_open_change)
+
+direct_labels <-  Water_Gather_withdraw %>% 
+  dplyr::group_by(Table_Type) %>%
+  dplyr::summarize(y = max(Change_Withdrawls))
+
+
+line_plot_height <- Water_Gather_withdraw %>%
+  ggplot(aes(t, Change_Withdrawls)) +
+  geom_line( aes(group = Table_Type, color = Table_Type), size = 1) +
+  scale_color_manual(values=colors_1) +
+  theme_minimal_hgrid() +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x = "Year", y = "Change in Withdrawls (acre feet)") +
+  theme(legend.position = "none") 
+  
+direct_labels_axis <- axis_canvas(line_plot_height, axis = "y") +
+  geom_text(
+ data = direct_labels,
+ aes(y = y, label = stringr::str_wrap(c("No Artifical Recharge", "Artificial Recharge Included"),1)),
+ x = .05,
+ size = 4.5,
+ hjust = 0,
+ vjust = -0.05
+  )
+
+p_direct_labels <-  insert_yaxis_grob(line_plot_height, direct_labels_axis)
+
+ggdraw(p_direct_labels)
+
+
 ```
 
