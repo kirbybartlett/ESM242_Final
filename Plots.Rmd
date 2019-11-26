@@ -15,8 +15,8 @@ library(tidyverse)
 library(cowplot)
 
 #if("dplyr" %in% (.packages())){
- #         detach("package:dplyr", unload=TRUE) 
-#          detach("package:plyr", unload=TRUE) 
+ #        detach("package:dplyr", unload=TRUE) 
+   #       detach("package:plyr", unload=TRUE) 
 #} 
 library(plyr)
 library(dplyr)
@@ -231,7 +231,7 @@ Water_Gather_withdraw <-  tidyr::gather(data = Water_Table, key = 'Table_Type', 
 
 direct_labels <-  Water_Gather_withdraw %>% 
   dplyr::group_by(Table_Type) %>%
-  dplyr::summarize(y = min(Height_ft))
+  dplyr::summarize(y = min(Withdrawls))
 
 
 line_plot_height <- Water_Gather_withdraw %>%
@@ -301,5 +301,45 @@ p_direct_labels <-  insert_yaxis_grob(line_plot_height, direct_labels_axis)
 ggdraw(p_direct_labels)
 
 
+```
+
+
+
+Benefits comparison 
+```{r}
+Benefits <- read_csv("Data/benefits.csv")
+
+Benefit_Gather_withdraw <-  tidyr::gather(data = Benefits, key = 'Manage_Type', value = 'Benefits', Benefit_optimal, Benefit_linear)
+
+direct_labels <-  Benefit_Gather_withdraw %>% 
+  dplyr::group_by(Manage_Type) %>%
+  dplyr::summarize(y = min(Benefits))
+
+
+line_plot_ben <- Benefit_Gather_withdraw %>%
+  ggplot(aes(Year, Benefits)) +
+  geom_line( aes(group = Manage_Type, color = Manage_Type), size = 1) +
+  scale_color_manual(values=colors_1) +
+  theme_minimal_hgrid() +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  labs(x = "Year", y = "Benefits ($)") +
+  scale_color_discrete(name = "Management Style", labels = c( "Linear Withdrawls", "Optimized Withdrawls"))
+  
+direct_labels_axis <- axis_canvas(line_plot_ben, axis = "y") +
+  geom_text(
+ data = direct_labels,
+ aes(y = y, label = stringr::str_wrap(c("No Artifical Recharge", "Artificial Recharge Included"),1)),
+ x = .05,
+ size = 4.5,
+ hjust = 0,
+ vjust = -0.05
+  )
+
+line_plot_ben
+
+#p_direct_labels <-  insert_yaxis_grob(line_plot_ben, direct_labels_axis)
+
+#ggdraw(p_direct_labels)
 ```
 

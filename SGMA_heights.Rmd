@@ -23,15 +23,35 @@ SGMA_heights <- read_csv("Data/height.csv")
 ```
 
 ```{r}
-# plot
+
+
+SGMA_heights <-  tidyr::gather(data = SGMA_heights, key = 'SGMA_Model', value = 'Height', SGMA_2040, SGMA_2060,  SGMA_2080, SGMA_2100)
+
+direct_labels <-  SGMA_heights %>% 
+  dplyr::group_by(SGMA_Model) %>%
+  dplyr::summarize(y = min(Height))
 
 sgma_h_plot <- SGMA_heights %>% 
-  gather(key = 'SGMA_Model', value = 'Height', SGMA_2040, SGMA_2060,  SGMA_2080, SGMA_2100) %>% 
   ggplot(aes(x = Year, y = Height)) +
-  geom_line(aes(color = SGMA_Model)) +
+  geom_line(aes(color = SGMA_Model), size = 1) +
   scale_color_manual(values = c('cyan4', "#F1A94E", "#669900", 'indianred3')) +
-  theme_minimal_hgrid() 
+  theme_minimal_hgrid() +
+  theme(legend.position = "none") +
+  labs(x = "Year from SGMA Implementation",
+       y = "Water Tabel Height (ft)")
+
+direct_labels_axis <- axis_canvas(sgma_h_plot, axis = "y") +
+  geom_text(
+ data = direct_labels,
+ aes(y = y, label = c("SGMA 2040", "SGMA 2060", "SGMA 2080", "SGMA 2100")),
+ x = 0.05,
+ size = 4.5,
+ hjust = 0
+  )
 
 
+p_direct_labels <-  insert_yaxis_grob(sgma_h_plot, direct_labels_axis)
+
+ggdraw(p_direct_labels)
 ```
 
