@@ -309,7 +309,11 @@ Benefits comparison
 ```{r}
 Benefits <- read_csv("Data/benefits.csv")
 
-Benefit_Gather_withdraw <-  tidyr::gather(data = Benefits, key = 'Manage_Type', value = 'Benefits', Benefit_optimal, Benefit_linear)
+Benefit_Gather_withdraw <-  tidyr::gather(data = Benefits, key = 'Manage_Type', value = 'Benefits', Optimal_Benefit, Linear_Benefit, Open_Benefits)
+
+bar_plot <- Benefits %>% 
+  ggplot(aes(x = Manage_Type, y = Benefits)) +
+  geom_bar(stat="identity")
 
 direct_labels <-  Benefit_Gather_withdraw %>% 
   dplyr::group_by(Manage_Type) %>%
